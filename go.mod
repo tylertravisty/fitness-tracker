@@ -2,7 +2,10 @@ module github.com/tylertravisty/fitness-tracker
 
 go 1.19
 
-require github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
+require (
+	github.com/mattn/go-sqlite3 v1.14.15
+	github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect

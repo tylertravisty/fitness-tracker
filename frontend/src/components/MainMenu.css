@@ -1,0 +1,16 @@
+.Menu {
+	background-color: #FFFFFF;
+	min-height: 100vh;
+}
+
+.MenuListDivLeft {
+	float: left;
+}
+
+.MenuListDivRight {
+	float: right;
+}
+
+.MenuListIcon {
+	height: 19px;
+}

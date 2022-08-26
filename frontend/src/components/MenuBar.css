@@ -1,0 +1,33 @@
+.MenuBar {
+	height: 48px;
+	background-color: #FFFFFF;
+}
+
+.MenuBarBottom {
+	border-bottom: 1px solid rgba(0,0,0,0.125);
+}
+
+.MenuBarBuffer {
+	height: 48px;
+}
+
+.MenuBarTitle {
+	color: #000000;
+	font-size: 32px;
+}
+
+.MenuBarLeftIcon {
+	height: 24px;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	margin-left: 16px;
+	float: left;
+}
+
+.MenuBarRightIcon {
+	height: 24px;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	margin-right: 16px;
+	float: right;
+}
