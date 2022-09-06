@@ -1,3 +1,4 @@
 .TimerActive::placeholder {
-	color: black;
+	color: black !important;
+	opacity: 1 !important;
 }

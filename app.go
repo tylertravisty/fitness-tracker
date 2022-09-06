@@ -124,3 +124,7 @@ func (a *App) WorkoutNew(workout models.Workout) error {
 func (a *App) WorkoutUpdate(workout models.Workout) error {
 	return a.WorkoutC.Update(workout)
 }
+
+func (a *App) WorkoutUpdateWithExercises(workout models.Workout) error {
+	return a.WorkoutC.UpdateWithExercises(workout)
+}

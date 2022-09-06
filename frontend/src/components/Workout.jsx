@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
+import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
@@ -31,8 +32,6 @@ function ParseDate(datetime) {
 }
 
 function Workout(props) {
-	const [timer, setTimer] = useState("000000");
-
 	if (props.edit) {
 		return (
 			<>
@@ -45,40 +44,7 @@ function Workout(props) {
 						</InputGroup>
 					</ListGroup.Item>
 				</ListGroup>
-				{props.workout.exercises.map((record, index) => (
-				<ListGroup variant="flush" className="MenuList">
-					<ListGroup.Item>
-						<Row>
-							<b>{record.exercise.name}</b>
-							{record.exercise.calories &&
-							<Col xs={4}>
-								<Form.Control placeholder="Calories" disabled/>
-							</Col>
-							}
-							{record.exercise.distance &&
-							<Col xs={4}>
-								<Form.Control placeholder="Distance" disabled/>
-							</Col>
-							}
-							{record.exercise.reps &&
-							<Col xs={4}>
-								<Form.Control placeholder="Reps" disabled/>
-							</Col>
-							}
-							{record.exercise.time &&
-							<Col xs={4}>
-								<TimerFormControl onChange={setTimer} value={record.result.time} disabled={true} />
-							</Col>
-							}
-							{record.exercise.weight &&
-							<Col xs={4}>
-								<Form.Control placeholder="Weight" disabled/>
-							</Col>
-							}
-						</Row>
-					</ListGroup.Item>
-				</ListGroup>
-				))}
+				<WorkoutInput exercises={props.workout.exercises} exerciseChange={props.workoutExerciseChange} disabled={true}/>
 			</>
 		);
 	}
@@ -93,55 +59,11 @@ function Workout(props) {
 				</ListGroup.Item>
 			</ListGroup>
 			<WorkoutInput exercises={props.workout.exercises} exerciseChange={props.workoutExerciseChange} />
-			{props.workout.exercises.map((record, index) => (
-			<ListGroup variant="flush" className="MenuList">
-				<ListGroup.Item>
-					<Row>
-						<b>{record.exercise.name}</b>
-						{record.exercise.calories &&
-						<Col xs={6} sm="auto">
-							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Calories</InputGroup.Text>
-								<Form.Control onChange={(event) => props.workoutExerciseChange(index, "calories", event.target.value)} placeholder="Calories" value={record.result.calories}/>
-							</InputGroup>
-						</Col>
-						}
-						{record.exercise.distance &&
-						<Col xs={6} sm="auto">
-							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Distance</InputGroup.Text>
-								<Form.Control onChange={(event) => props.workoutExerciseChange(index, "distance", event.target.value)} placeholder="Distance" value={record.result.distance}/>
-							</InputGroup>
-						</Col>
-						}
-						{record.exercise.reps &&
-						<Col xs={6} sm="auto">
-							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Reps</InputGroup.Text>
-								<Form.Control placeholder="Reps" value={record.result.reps} value={null}/>
-							</InputGroup>
-						</Col>
-						}
-						{record.exercise.time &&
-						<Col xs={6} sm="auto">
-							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Time</InputGroup.Text>
-								<TimerFormControl onChange={setTimer} value={record.result.time} disabled={false}/>
-							</InputGroup>
-						</Col>
-						}
-						{record.exercise.weight &&
-						<Col xs={6} sm="auto">
-							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Weight</InputGroup.Text>
-								<Form.Control placeholder="Weight" value={record.result.weight}/>
-							</InputGroup>
-						</Col>
-						}
-					</Row>
+			<ListGroup variant="flush">
+				<ListGroup.Item className="d-flex justify-content-center">
+					<Button variant="primary" onClick={props.submitWorkoutHandler}>Submit</Button>
 				</ListGroup.Item>
 			</ListGroup>
-			))}
 		</>
 	);
 }

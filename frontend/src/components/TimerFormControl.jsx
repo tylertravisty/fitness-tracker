@@ -34,9 +34,14 @@ function TimerFormControl(props) {
 			return;
 		}
 
+
 		let shift = props.value.substring(0, 5);
 		let newTimer = "0" + shift;
-		props.onChange(newTimer);
+		if (position > 4) {
+			props.onChange(null);
+		} else {
+			props.onChange(newTimer);
+		}
 
 		let newTimerS = TimerString(newTimer);
 		setTimerS(newTimerS);

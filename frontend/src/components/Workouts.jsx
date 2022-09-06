@@ -20,6 +20,7 @@ import {
 	GetWorkoutWithExercises,
 	NewWorkout,
 	UpdateWorkout,
+	UpdateWorkoutWithExercises,
 } from '../controllers/build/WorkoutsMenu';
 import InfiniteScroll from "./InfiniteScroll";
 import MenuBar from './MenuBar';
@@ -177,13 +178,13 @@ function Workouts(props) {
 
 	const closeWorkoutPage = () => {
 		resetWorkout();
+		setWorkoutWithExercises({});
 		setWorkoutPage(false);
 		reload();
 	};
 
 	const openWorkoutPage = (event) => {
 		const index = event.target.getAttribute('value');
-		//setWorkoutName(workouts[index].name);
 		getWorkoutWithExercises(workouts[index].id);
 		setWorkoutPage(true);
 	};
@@ -219,6 +220,7 @@ function Workouts(props) {
 		};
 		updateWorkout(workout);
 		resetWorkout();
+		resetOrigWorkout();
 		setWorkoutPageEdit(false);
 		setWorkoutPage(true);
 	};
@@ -266,6 +268,15 @@ function Workouts(props) {
 		setOnReloadWorkout(!onReloadWorkout);
 	}
 
+	const workoutSubmit = () => {
+		setError("Submitting workout with exercises");
+		UpdateWorkoutWithExercises(workoutWithExercises).then(() => {
+			setError("");
+		}).catch((err) => {
+			setError(err);
+		});
+	}
+
 	if (error !== "") {
 		return (
 			<>
@@ -280,7 +291,7 @@ function Workouts(props) {
 		return(
 			<>
 				<MenuBar bottom={true} leftIcon={cancel} leftClick={cancelWorkoutPageEdit} title={"Workout"} rightIcon={save} rightClick={saveWorkoutPage} />
-				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} timeChange={workoutTimeChange} workoutExerciseChange={workoutExerciseChange} />
+				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} workoutExerciseChange={workoutExerciseChange} workoutExerciseChange={workoutExerciseChange} />
 				<Navigation parent={NavHome} reset={closeWorkoutPage} />
 			</>
 		);
@@ -290,13 +301,12 @@ function Workouts(props) {
 		return(
 			<>
 				<MenuBar bottom={true} leftIcon={back} leftClick={closeWorkoutPage} title={"Workout"} rightIcon={pencil} rightClick={editWorkoutPage} />
-				<Workout workout={workoutWithExercises} workoutExerciseChange={workoutExerciseChange} edit={false}/>
+				<Workout workout={workoutWithExercises} workoutExerciseChange={workoutExerciseChange} submitWorkoutHandler={workoutSubmit} edit={false}/>
 				<Navigation parent={NavHome} reset={closeWorkoutPage} />
 			</>
 		);
 	}
 
-	console.log("THIS WORKS COOL 444!")
 	return (
 		<div className="Workouts">
 			<MenuBar title={"Workouts"} leftIcon={blank} rightIcon={pluscircle} rightClick={openNewWorkout}/>

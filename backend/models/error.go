@@ -1,14 +1,14 @@
 package models
 
 const (
-	ErrExerciseInvalidID   ValidatorError = "invalid exercise ID"
-	ErrExerciseInvalidName ValidatorError = "invalid exercise name"
-	ErrWorkoutInvalidID    ValidatorError = "invalid workout ID"
-	ErrWorkoutInvalidTitle ValidatorError = "invalid workout title"
+	ErrExerciseInvalidID   UserError = "invalid exercise ID"
+	ErrExerciseInvalidName UserError = "invalid exercise name"
+	ErrWorkoutInvalidID    UserError = "invalid workout ID"
+	ErrWorkoutInvalidTitle UserError = "invalid workout title"
 )
 
-type ValidatorError string
+type UserError string
 
-func (ve ValidatorError) Error() string {
-	return string(ve)
+func (ue UserError) Error() string {
+	return string(ue)
 }

@@ -2,6 +2,15 @@ Workout tracker notes
 
 # Doing
 
+Models
+- write workoutexercise Update function
+- for all models: if pointer passed in is nil, return error
+	- add a validation function to check if argument is nil
+	- make this the first validator function
+
+Frontend
+- implement workout submit button to update workout/exercises
+
 WorkoutExercise data model
 - Update: test that nil values are stored as null in database
 
@@ -11,9 +20,6 @@ WorkoutExercise data model
 	- refactor all return statements to make changes easier to implement
 
 Workout frontend
-- Move Exercise input boxes to its own component
-	- add disabled={props.disabled} to each Form.Control
-	- pass in props.WorkoutExerciseChange, disabled
 - Finish adding onChange handlers to the workout input boxes
 - Handle actual workoutexercise data object
 - duplicating loop to render each exercise and input boxes in the workout.

@@ -70,7 +70,7 @@ type WorkoutExerciseService interface {
 	AutoMigrate() error
 	Create(we *WorkoutExercise) error
 	//Delete(we *WorkoutExercise) error
-	//Update(we *WorkoutExercise) error
+	Update(we *WorkoutExercise) error
 }
 
 var _ WorkoutExerciseService = &workoutExerciseService{}
@@ -104,6 +104,7 @@ func (wes *workoutExerciseService) AutoMigrate() error {
 func (wes *workoutExerciseService) Create(we *WorkoutExercise) error {
 	err := runWorkoutExerciseValFuncs(
 		we,
+		workoutExerciseNotNil,
 		workoutExerciseWorkoutIDMinimum,
 		workoutExerciseExerciseIDMinimum,
 	)
@@ -124,6 +125,29 @@ func (wes *workoutExerciseService) Create(we *WorkoutExercise) error {
 	return nil
 }
 
+func (wes *workoutExerciseService) Update(we *WorkoutExercise) error {
+	err := runWorkoutExerciseValFuncs(
+		we,
+		workoutExerciseNotNil,
+	)
+	if err != nil {
+		return fmt.Errorf("models: %w", err)
+	}
+
+	updateWorkoutExerciseQ := fmt.Sprintf(`
+		UPDATE "%s"
+		SET calories=?, distance=?, reps=?, time=?, weight=?
+		WHERE id=?
+	`, workoutExerciseTable)
+
+	_, err = wes.Database.Exec(updateWorkoutExerciseQ, we.Calories, we.Distance, we.Reps, we.Time, we.Weight, we.ID)
+	if err != nil {
+		return fmt.Errorf("models: error updating %s: %v", workoutExerciseTable, err)
+	}
+
+	return nil
+}
+
 type workoutExerciseValFunc func(*WorkoutExercise) error
 
 func runWorkoutExerciseValFuncs(we *WorkoutExercise, fns ...workoutExerciseValFunc) error {
@@ -132,6 +156,14 @@ func runWorkoutExerciseValFuncs(we *WorkoutExercise, fns ...workoutExerciseValFu
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func workoutExerciseNotNil(we *WorkoutExercise) error {
+	if we == nil {
+		return fmt.Errorf("workoutexercise is nil")
 	}
 
 	return nil

@@ -8,9 +8,82 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Row from 'react-bootstrap/Row';
 
+import DecimalFormControl from './DecimalFormControl';
 import TimerFormControl from './TimerFormControl';
 
 function WorkoutInput(props) {
+	const nullToEmpty = (value) => {
+		if (value === null) {
+			return "";
+		}
+
+		return value;
+	};
+
+	const onChangeNum = (index, type, value) => {
+		console.log(value);
+		if (value === null || value === "") {
+			props.exerciseChange(index, type, null);
+			return;
+		}
+
+		if (value.slice(-1) === ".") {
+			setDecimal(true);
+		} else {
+			setDecimal(false);
+		}
+
+		// Values cannot have more than 16 digits
+		if (value.length > 16) {
+			return;
+		}
+
+		let num = Number(value);
+		if (isNaN(num)) {
+			return;
+		}
+
+		if (!Number.isInteger(num)) {
+			return;
+		}
+
+		props.exerciseChange(index, type, num)
+	};
+
+	const timeIntToString = (time) => {
+		if (time === null) {
+			return null;
+		}
+
+		let h = Math.floor(time / 3600);
+		let m = Math.floor(time % 3600 / 60);
+		let s = Math.floor(time % 3600 % 60);
+
+		return ('0' + h).slice(-2) + ('0' + m).slice(-2) + ('0' + s).slice(-2);
+	};
+
+	const timeStringToInt = (timeS) => {
+		if (timeS === null) {
+			return null;
+		}
+
+		let hh = timeS.substring(0,2);
+		let mm = timeS.substring(2, 4);
+		let ss = timeS.substring(4);
+
+		let h = Number(hh);
+		let m = Number(mm);
+		let s = Number(ss);
+
+		return (h * 3600) + (m * 60) + (s);
+	};
+
+	const onChangeTime = (index, timeS) => {
+		let time = timeStringToInt(timeS);
+
+		props.exerciseChange(index, "time", time)
+	};
+
 	return (
 		<>
 			{props.exercises.map((record, index) => (
@@ -22,7 +95,7 @@ function WorkoutInput(props) {
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
 								<InputGroup.Text id="inputGroup-sizing-sm">Calories</InputGroup.Text>
-								<Form.Control onChange={(event) => props.exerciseChange(index, "calories", event.target.value)} placeholder="Calories" value={record.result.calories}/>
+								<Form.Control onChange={(event) => onChangeNum(index, "calories", event.target.value)} placeholder="Calories" value={nullToEmpty(record.result.calories)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
 						}
@@ -30,7 +103,7 @@ function WorkoutInput(props) {
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
 								<InputGroup.Text id="inputGroup-sizing-sm">Distance</InputGroup.Text>
-								<Form.Control onChange={(event) => props.workoutExerciseChange(index, "distance", event.target.value)} placeholder="Distance" value={record.result.distance}/>
+								<DecimalFormControl onChange={props.exerciseChange} placeholder={"Distance"} value={nullToEmpty(record.result.distance)} index={index} type={"distance"} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
 						}
@@ -38,7 +111,7 @@ function WorkoutInput(props) {
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
 								<InputGroup.Text id="inputGroup-sizing-sm">Reps</InputGroup.Text>
-								<Form.Control placeholder="Reps" value={record.result.reps} value={null}/>
+								<Form.Control onChange={(event) => onChangeNum(index, "reps", event.target.value)} placeholder="Reps" value={nullToEmpty(record.result.reps)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
 						}
@@ -46,7 +119,7 @@ function WorkoutInput(props) {
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
 								<InputGroup.Text id="inputGroup-sizing-sm">Time</InputGroup.Text>
-								<TimerFormControl value={record.result.time} disabled={false}/>
+								<TimerFormControl onChange={(timeS) => onChangeTime(index, timeS)} value={timeIntToString(record.result.time)} disabled={props.disabled}/>
 							</InputGroup>
 						</Col>
 						}
@@ -54,7 +127,7 @@ function WorkoutInput(props) {
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
 								<InputGroup.Text id="inputGroup-sizing-sm">Weight</InputGroup.Text>
-								<Form.Control placeholder="Weight" value={record.result.weight}/>
+								<Form.Control onChange={(event) => onChangeNum(index, "weight", event.target.value)} placeholder="Weight" value={nullToEmpty(record.result.weight)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
 						}
