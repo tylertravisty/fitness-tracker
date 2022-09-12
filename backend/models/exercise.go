@@ -49,6 +49,7 @@ func NewExerciseService(db *sql.DB) ExerciseService {
 }
 
 type ExerciseService interface {
+	All() ([]Exercise, error)
 	AutoMigrate() error
 	ByLimitOffset(limit int, offset int) ([]Exercise, error)
 	ByName(name string) (*Exercise, error)
@@ -61,6 +62,37 @@ var _ ExerciseService = &exerciseService{}
 
 type exerciseService struct {
 	Database *sql.DB
+}
+
+func (es *exerciseService) All() ([]Exercise, error) {
+	exerciseQ := fmt.Sprintf(`
+		SELECT id, name, calories, distance, reps, time, weight
+		FROM "%s"
+		ORDER BY name ASC
+	`, exerciseTable)
+
+	rows, err := es.Database.Query(exerciseQ)
+	if err != nil {
+		return nil, fmt.Errorf("models: error while querying \"%s\" for all rows: %v", exerciseTable, err)
+	}
+	defer rows.Close()
+
+	exercises := []Exercise{}
+	for rows.Next() {
+		var se sqlExercise
+		err = rows.Scan(&se.id, &se.name, &se.calories, &se.distance, &se.reps, &se.time, &se.weight)
+		if err != nil {
+			return nil, fmt.Errorf("models: error while scanning row from \"%s\": %v", exerciseTable, err)
+		}
+
+		exercises = append(exercises, *se.toExercise())
+	}
+	err = rows.Err()
+	if err != nil && err != sql.ErrNoRows {
+		return nil, fmt.Errorf("models: error while iterating over rows from \"%s\": %v", exerciseTable, err)
+	}
+
+	return exercises, nil
 }
 
 func (es *exerciseService) AutoMigrate() error {

@@ -55,6 +55,33 @@ func (wc *WorkoutController) AddExercise(w *models.Workout, exr *models.Exercise
 	return userErr
 }
 
+func (wc *WorkoutController) Edit(workout models.Workout) error {
+	err := wc.Update(workout)
+	if err != nil {
+		return err
+	}
+
+	for _, exercise := range workout.Exercises {
+		err = wc.wes.Delete(exercise.Result)
+		if err != nil {
+			return wc.c.userError("error deleting workoutexercise", err, ErrWorkoutExerciseUpdate)
+		}
+	}
+
+	for _, exercise := range workout.Exercises {
+		err = wc.wes.Create(exercise.Result)
+		if err != nil {
+			return wc.c.userError("error creating workoutexercise", err, ErrWorkoutAddExercise)
+		}
+		err = wc.wes.Update(exercise.Result)
+		if err != nil {
+			return wc.c.userError("error updating workoutexercise", err, ErrWorkoutExerciseUpdate)
+		}
+	}
+
+	return nil
+}
+
 func (wc *WorkoutController) Update(workout models.Workout) error {
 	loc, err := time.LoadLocation("UTC")
 	if err != nil {
@@ -72,6 +99,10 @@ func (wc *WorkoutController) Update(workout models.Workout) error {
 	if err != nil {
 		return wc.c.userError("error updating workout", err, ErrWorkoutUpdate)
 	}
+
+	// TODO: implement all of the checking to add/remove exercises
+	// get existing exercises from database, check against list passed in from frontend
+	// if missing, delete; if extra, add.
 
 	return nil
 }

@@ -21,16 +21,9 @@ function WorkoutInput(props) {
 	};
 
 	const onChangeNum = (index, type, value) => {
-		console.log(value);
 		if (value === null || value === "") {
 			props.exerciseChange(index, type, null);
 			return;
-		}
-
-		if (value.slice(-1) === ".") {
-			setDecimal(true);
-		} else {
-			setDecimal(false);
 		}
 
 		// Values cannot have more than 16 digits

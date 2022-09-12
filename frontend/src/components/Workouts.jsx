@@ -16,6 +16,7 @@ import {
 } from './Navigation';
 
 import {
+	EditWorkout,
 	GetWorkouts,
 	GetWorkoutWithExercises,
 	NewWorkout,
@@ -80,6 +81,7 @@ function Workouts(props) {
 	const [workoutTitle, setWorkoutTitle] = useState("");
 	const [origWorkoutTitle, setOrigWorkoutTitle] = useState("");
 	const [workoutExercises, setWorkoutExercises] = useState([]);
+	const [origWorkoutExercises, setOrigWorkoutExercises] = useState([]);
 	const [workoutWithExercises, setWorkoutWithExercises] = useState({});
 
 	useEffect(() => {
@@ -141,6 +143,17 @@ function Workouts(props) {
 		});
 	};
 
+	const updateWorkoutAddExercises = (workout) => {
+		setError("Updating workout");
+		EditWorkout(workout).then(() => {
+			setError("");
+		}).catch((err) => {
+			setError(err);
+		});
+
+		getWorkoutWithExercises(workout.id);
+	};
+
 	const resetWorkout = () => {
 		setWorkoutID(0);
 		setWorkoutDate("");
@@ -151,7 +164,7 @@ function Workouts(props) {
 	const resetOrigWorkout = () => {
 		setOrigWorkoutDate("");
 		setOrigWorkoutTitle("");
-		//setOrigWorkoutExercises([]);
+		setOrigWorkoutExercises([]);
 	}
 
 	const closeNewWorkout = () => {
@@ -183,8 +196,7 @@ function Workouts(props) {
 		reload();
 	};
 
-	const openWorkoutPage = (event) => {
-		const index = event.target.getAttribute('value');
+	const openWorkoutPage = (index) => {
 		getWorkoutWithExercises(workouts[index].id);
 		setWorkoutPage(true);
 	};
@@ -196,6 +208,7 @@ function Workouts(props) {
 		let origWorkout = workoutWithExercises;
 		origWorkout.date = origWorkoutDate;
 		origWorkout.title = origWorkoutTitle;
+		origWorkout.exercises = origWorkoutExercises;
 
 		setWorkoutWithExercises(origWorkout);
 		setWorkoutPage(true);
@@ -208,6 +221,8 @@ function Workouts(props) {
 		setOrigWorkoutDate(workoutWithExercises.date);
 		setWorkoutTitle(workoutWithExercises.title);
 		setOrigWorkoutTitle(workoutWithExercises.title);
+		setWorkoutExercises(workoutWithExercises.exercises);
+		setOrigWorkoutExercises(workoutWithExercises.exercises);
 		setWorkoutPage(false);
 		setWorkoutPageEdit(true);
 	};
@@ -217,8 +232,9 @@ function Workouts(props) {
 			id: workoutID,
 			date: workoutDate,
 			title: workoutTitle,
+			exercises: workoutExercises,
 		};
-		updateWorkout(workout);
+		updateWorkoutAddExercises(workout);
 		resetWorkout();
 		resetOrigWorkout();
 		setWorkoutPageEdit(false);
@@ -261,6 +277,20 @@ function Workouts(props) {
 		setWorkoutWithExercises(newWorkout);
 	};
 
+	const workoutExerciseAdd = (newExercise) => {
+		let newRecord = {
+			exercise: newExercise,
+			result: {workout_id: workoutID, exercise_id: newExercise.id, calories: null, distance: null, reps: null, time: null, weight: null},
+		};
+		let newExercises = [...workoutWithExercises.exercises, newRecord];
+
+		let newWorkout = workoutWithExercises;
+		newWorkout.exercises = newExercises;
+
+		setWorkoutExercises(newExercises);
+		setWorkoutWithExercises(newWorkout);
+	}
+
 	const workoutExerciseChange = (index, type, value) => {
 		let updateWE = workoutWithExercises;
 		updateWE.exercises[index].result[type] = value;
@@ -291,7 +321,7 @@ function Workouts(props) {
 		return(
 			<>
 				<MenuBar bottom={true} leftIcon={cancel} leftClick={cancelWorkoutPageEdit} title={"Workout"} rightIcon={save} rightClick={saveWorkoutPage} />
-				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} workoutExerciseChange={workoutExerciseChange} workoutExerciseChange={workoutExerciseChange} />
+				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} exerciseAdd={workoutExerciseAdd} workoutExerciseChange={workoutExerciseChange} />
 				<Navigation parent={NavHome} reset={closeWorkoutPage} />
 			</>
 		);
@@ -312,8 +342,8 @@ function Workouts(props) {
 			<MenuBar title={"Workouts"} leftIcon={blank} rightIcon={pluscircle} rightClick={openNewWorkout}/>
 			<ListGroup variant="flush" className="MenuList">
 				{workouts.map((workout, index) => (
-				<ListGroup.Item key={index} value={index} action onClick={openWorkoutPage}>
-					<b value={index} onClick={openWorkoutPage}>{workout.title}</b><br/>
+					<ListGroup.Item key={index} value={index} action onClick={(event) => {openWorkoutPage(event.target.getAttribute('value'))}}>
+						<b value={index}>{workout.title}</b><br/>
 					{workout.date.substring(0, 16) + workout.date.substring(22)}
 				</ListGroup.Item>
 				))}

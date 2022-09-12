@@ -18,6 +18,10 @@ func (ec *ExerciseController) Get(page int) ([]models.Exercise, error) {
 	return ec.es.ByLimitOffset(10, 10*page)
 }
 
+func (ec *ExerciseController) GetAll() ([]models.Exercise, error) {
+	return ec.es.All()
+}
+
 func (ec *ExerciseController) New(exercise models.Exercise) error {
 	return ec.es.Create(&exercise)
 }

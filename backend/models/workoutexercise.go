@@ -69,7 +69,7 @@ func NewWorkoutExerciseService(db *sql.DB) WorkoutExerciseService {
 type WorkoutExerciseService interface {
 	AutoMigrate() error
 	Create(we *WorkoutExercise) error
-	//Delete(we *WorkoutExercise) error
+	Delete(we *WorkoutExercise) error
 	Update(we *WorkoutExercise) error
 }
 
@@ -115,11 +115,43 @@ func (wes *workoutExerciseService) Create(we *WorkoutExercise) error {
 	insertWorkoutExerciseQ := fmt.Sprintf(`
 		INSERT INTO "%s" (workout_id, exercise_id)
 		VALUES (?, ?)
+		RETURNING id
 	`, workoutExerciseTable)
 
-	_, err = wes.Database.Exec(insertWorkoutExerciseQ, we.WorkoutID, we.ExerciseID)
+	//_, err = wes.Database.Exec(insertWorkoutExerciseQ, we.WorkoutID, we.ExerciseID)
+	//if err != nil {
+	//	return fmt.Errorf("models: error while inserting %s: %v", workoutExerciseTable, err)
+	//}
+
+	var id int64
+	row := wes.Database.QueryRow(insertWorkoutExerciseQ, we.WorkoutID, we.ExerciseID)
+	err = row.Scan(&id)
 	if err != nil {
 		return fmt.Errorf("models: error while inserting %s: %v", workoutExerciseTable, err)
+	}
+
+	we.ID = id
+
+	return nil
+}
+
+func (wes *workoutExerciseService) Delete(we *WorkoutExercise) error {
+	err := runWorkoutExerciseValFuncs(
+		we,
+		workoutExerciseNotNil,
+	)
+	if err != nil {
+		return fmt.Errorf("models: %w", err)
+	}
+
+	deleteWorkoutExerciseQ := fmt.Sprintf(`
+		DELETE FROM "%s"
+		WHERE id=?
+	`, workoutExerciseTable)
+
+	_, err = wes.Database.Exec(deleteWorkoutExerciseQ, we.ID)
+	if err != nil {
+		return fmt.Errorf("models: error updating %s: %v", workoutExerciseTable, err)
 	}
 
 	return nil

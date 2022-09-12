@@ -2,40 +2,28 @@ Workout tracker notes
 
 # Doing
 
+Design
+- Each exercise type needs its own color
+
+Delete button
+- Delete workouts from main page
+- Delete exercises from exercise menu
+
+Error messages
+- display error messages better
+- display loading messages better
+
+Controllers
+- add userError to all controller functions
+
 Models
-- write workoutexercise Update function
 - for all models: if pointer passed in is nil, return error
 	- add a validation function to check if argument is nil
 	- make this the first validator function
 
-Frontend
-- implement workout submit button to update workout/exercises
-
-WorkoutExercise data model
-- Update: test that nil values are stored as null in database
-
-- TimerFormControl
-	- handle null timer value passed into it
-	- add functionality to disable input box
-	- refactor all return statements to make changes easier to implement
-
-Workout frontend
-- Finish adding onChange handlers to the workout input boxes
-- Handle actual workoutexercise data object
-- duplicating loop to render each exercise and input boxes in the workout.
-	- move to its own component.
-	- add variable to make input boxes editable/non-editable; when workout is in edit mode, exercise input boxes are frozen/non-editable.
-
-Timer bug
-- Timer boxes all use the same variable to decide if box should be greyed out.
-
 Workout
-- Edit workout
-	- Add exercises to workout
-- Submit button to save results once entered
 - Add rounds to workout?
 - Delete button on workout page (not in list)
-
 
 Parsing Date:
 - should dates be stored in standard format to make conversions in frontend easier?
@@ -48,12 +36,6 @@ Parsing Date:
 		- will need to store what timezone was used
 		- will need to allow user to change timezone
 
-Workout model
-- Add time field to workout (amount of time to complete workout)
-	- stored as separate time field from date (call it something different? clock?)
-- Should workout have its own calories field to record calories for entire workout?
-
-
 Workouts
 - On back, set scroll position to same as before opening workout page
 	- Save scroll position when opening workout page
@@ -61,9 +43,6 @@ Workouts
 
 Datetime picker
 - Use Go to format datetime string in better format
-
-Database null values
-- How to handle these?
 
 Frontend:
 - Errors
@@ -93,7 +72,17 @@ Frontend:
 
 # To Do
 
-Track weight in app
+Database null values
+- change all models to use pointers to handle nulls
+
+Re-order exercises in a workout
+- add a position field in the workoutexercise table
+- when querying workoutexercises, order by position field (ASC)
+
+AddExerciseModal in Workout edit page
+- figure out how to paginate exercises in the drop-down menu instead of getting all of them at once.
+
+Track user's weight in app
 
 SQL functions:
 	- return error values, including ErrNullValue to indicate null value

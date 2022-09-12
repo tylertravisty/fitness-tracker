@@ -93,6 +93,10 @@ func (a *App) PrintNum(i int, s interface{}) {
 	fmt.Println(i, ":", s)
 }
 
+func (a *App) ExerciseGetAll() ([]models.Exercise, error) {
+	return a.ExerciseC.GetAll()
+}
+
 func (a *App) ExerciseGet(page int) ([]models.Exercise, error) {
 	return a.ExerciseC.Get(page)
 }
@@ -107,6 +111,10 @@ func (a *App) ExerciseUpdate(exercise models.Exercise) error {
 
 func (a *App) WorkoutAddExercise(workoutID int64, exerciseID int64) error {
 	return a.WorkoutC.AddExercise(&models.Workout{ID: workoutID}, &models.Exercise{ID: exerciseID})
+}
+
+func (a *App) WorkoutEdit(workout models.Workout) error {
+	return a.WorkoutC.Edit(workout)
 }
 
 func (a *App) WorkoutGet(page int) ([]models.Workout, error) {

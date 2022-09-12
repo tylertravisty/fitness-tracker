@@ -1,11 +1,16 @@
 import {
 	ExerciseGet,
+	ExerciseGetAll,
 	ExerciseNew,
 	ExerciseUpdate
 } from '../../../wailsjs/go/main/App';
 
 function GetExercises(page) {
 	return ExerciseGet(page);
+}
+
+function GetAllExercises() {
+	return ExerciseGetAll();
 }
 
 function NewExercise(exercise) {
@@ -18,6 +23,7 @@ function UpdateExercise(exercise) {
 
 export {
 	GetExercises,
+	GetAllExercises,
 	NewExercise,
 	UpdateExercise,
 };

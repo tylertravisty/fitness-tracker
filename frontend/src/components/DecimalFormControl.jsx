@@ -24,7 +24,6 @@ function DecimalFormControl(props) {
 	}
 
 	const onChangeDec = (index, type, value) => {
-		console.log(value);
 		if (value === null || value === "") {
 			props.onChange(index, type, null);
 			return;
