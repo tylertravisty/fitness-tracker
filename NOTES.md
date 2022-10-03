@@ -2,28 +2,28 @@ Workout tracker notes
 
 # Doing
 
-Design
-- Each exercise type needs its own color
+Refactor opening workoutPage code
+Need to fix ordering with opening workout page
+- open in .then() part of GetWorkoutWithExercises
+- need to figure out which values to set (workoutPage or workoutPageEdit)
+- pass in function to getWorkoutWithExercises to set correct values?
+	- function gets called in .then()
+- getWorkoutWithExercises is broken
 
-Delete button
-- Delete workouts from main page
-- Delete exercises from exercise menu
+Add icons to workouts list
+- left side
 
-Error messages
-- display error messages better
-- display loading messages better
+Exercise menu 
+	- tell user which workouts use that exercise?
+	- add info button to drop down menu which shows user which workouts use that exercise
+		- add link to that exercise?
 
-Controllers
-- add userError to all controller functions
-
-Models
-- for all models: if pointer passed in is nil, return error
-	- add a validation function to check if argument is nil
-	- make this the first validator function
+Pull to refresh
+- scroll from top
+- top hides under header
 
 Workout
 - Add rounds to workout?
-- Delete button on workout page (not in list)
 
 Parsing Date:
 - should dates be stored in standard format to make conversions in frontend easier?

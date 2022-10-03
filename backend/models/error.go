@@ -1,10 +1,11 @@
 package models
 
 const (
-	ErrExerciseInvalidID   UserError = "invalid exercise ID"
-	ErrExerciseInvalidName UserError = "invalid exercise name"
-	ErrWorkoutInvalidID    UserError = "invalid workout ID"
-	ErrWorkoutInvalidTitle UserError = "invalid workout title"
+	ErrExerciseDeleteInWorkout UserError = "cannot delete exercise used in workout"
+	ErrExerciseInvalidID       UserError = "invalid exercise ID"
+	ErrExerciseInvalidName     UserError = "invalid exercise name"
+	ErrWorkoutInvalidID        UserError = "invalid workout ID"
+	ErrWorkoutInvalidTitle     UserError = "invalid workout title"
 )
 
 type UserError string

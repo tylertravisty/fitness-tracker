@@ -55,17 +55,23 @@ func (wc *WorkoutController) AddExercise(w *models.Workout, exr *models.Exercise
 	return userErr
 }
 
+func (wc *WorkoutController) Delete(workout models.Workout) error {
+	err := wc.ws.Delete(&workout)
+	userErr := wc.c.userError("error deleting workout", err, ErrWorkoutDelete)
+
+	return userErr
+}
+
 func (wc *WorkoutController) Edit(workout models.Workout) error {
 	err := wc.Update(workout)
 	if err != nil {
+		// Update returns userError() result
 		return err
 	}
 
-	for _, exercise := range workout.Exercises {
-		err = wc.wes.Delete(exercise.Result)
-		if err != nil {
-			return wc.c.userError("error deleting workoutexercise", err, ErrWorkoutExerciseUpdate)
-		}
+	err = wc.wes.DeleteByWorkout(&workout)
+	if err != nil {
+		return wc.c.userError("error deleteing woroutexercise by workout", err, ErrWorkoutExerciseUpdate)
 	}
 
 	for _, exercise := range workout.Exercises {
@@ -100,16 +106,13 @@ func (wc *WorkoutController) Update(workout models.Workout) error {
 		return wc.c.userError("error updating workout", err, ErrWorkoutUpdate)
 	}
 
-	// TODO: implement all of the checking to add/remove exercises
-	// get existing exercises from database, check against list passed in from frontend
-	// if missing, delete; if extra, add.
-
 	return nil
 }
 
 func (wc *WorkoutController) UpdateWithExercises(workout models.Workout) error {
 	err := wc.Update(workout)
 	if err != nil {
+		// Update returns userError() result
 		return err
 	}
 

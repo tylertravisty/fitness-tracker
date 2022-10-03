@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"fmt"
+
+	sqlite3 "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -222,6 +224,10 @@ func (es *exerciseService) Delete(exr *Exercise) error {
 
 	_, err = es.Database.Exec(deleteExerciseQ, exr.Name)
 	if err != nil {
+		sqliteErr := err.(sqlite3.Error)
+		if sqliteErr.ExtendedCode == sqlite3.ErrConstraintForeignKey {
+			return fmt.Errorf("models: error while deleting %s: %w: %v", exerciseTable, ErrExerciseDeleteInWorkout, err)
+		}
 		return fmt.Errorf("models: error while deleting %s: %v", exerciseTable, err)
 	}
 
@@ -255,6 +261,10 @@ func (es *exerciseService) Update(exr *Exercise) error {
 type exerciseValFunc func(*Exercise) error
 
 func runExerciseValFuncs(exr *Exercise, fns ...exerciseValFunc) error {
+	if exr == nil {
+		return fmt.Errorf("exercise is nil")
+	}
+
 	for _, fn := range fns {
 		err := fn(exr)
 		if err != nil {

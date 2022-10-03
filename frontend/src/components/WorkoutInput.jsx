@@ -11,6 +11,8 @@ import Row from 'react-bootstrap/Row';
 import DecimalFormControl from './DecimalFormControl';
 import TimerFormControl from './TimerFormControl';
 
+import './WorkoutInput.css';
+
 function WorkoutInput(props) {
 	const nullToEmpty = (value) => {
 		if (value === null) {
@@ -87,7 +89,7 @@ function WorkoutInput(props) {
 						{record.exercise.calories &&
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Calories</InputGroup.Text>
+								<InputGroup.Text className="CaloriesInput" id="inputGroup-sizing-sm"><b>Calories</b></InputGroup.Text>
 								<Form.Control onChange={(event) => onChangeNum(index, "calories", event.target.value)} placeholder="Calories" value={nullToEmpty(record.result.calories)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
@@ -95,7 +97,7 @@ function WorkoutInput(props) {
 						{record.exercise.distance &&
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Distance</InputGroup.Text>
+								<InputGroup.Text className="DistanceInput" id="inputGroup-sizing-sm"><b>Distance</b></InputGroup.Text>
 								<DecimalFormControl onChange={props.exerciseChange} placeholder={"Distance"} value={nullToEmpty(record.result.distance)} index={index} type={"distance"} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
@@ -103,7 +105,7 @@ function WorkoutInput(props) {
 						{record.exercise.reps &&
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Reps</InputGroup.Text>
+								<InputGroup.Text className="RepsInput" id="inputGroup-sizing-sm"><b>Reps</b></InputGroup.Text>
 								<Form.Control onChange={(event) => onChangeNum(index, "reps", event.target.value)} placeholder="Reps" value={nullToEmpty(record.result.reps)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>
@@ -111,7 +113,7 @@ function WorkoutInput(props) {
 						{record.exercise.time &&
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Time</InputGroup.Text>
+								<InputGroup.Text className="TimeInput" id="inputGroup-sizing-sm"><b>Time</b></InputGroup.Text>
 								<TimerFormControl onChange={(timeS) => onChangeTime(index, timeS)} value={timeIntToString(record.result.time)} disabled={props.disabled}/>
 							</InputGroup>
 						</Col>
@@ -119,7 +121,7 @@ function WorkoutInput(props) {
 						{record.exercise.weight &&
 						<Col xs={6} sm="auto">
 							<InputGroup size="sm" className="mb-3">
-								<InputGroup.Text id="inputGroup-sizing-sm">Weight</InputGroup.Text>
+								<InputGroup.Text className="WeightInput" id="inputGroup-sizing-sm"><b>Weight</b></InputGroup.Text>
 								<Form.Control onChange={(event) => onChangeNum(index, "weight", event.target.value)} placeholder="Weight" value={nullToEmpty(record.result.weight)} disabled={props.disabled} />
 							</InputGroup>
 						</Col>

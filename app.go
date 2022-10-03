@@ -77,20 +77,16 @@ func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) (string, error) {
-	if name == "Error" {
-		return "", fmt.Errorf("this is an error from the backend")
-	}
-	return fmt.Sprintf("Hello %s, It's show time!", name), nil
-}
-
 func (a *App) Print(i string, s interface{}) {
 	fmt.Println(i, ":", s)
 }
 
 func (a *App) PrintNum(i int, s interface{}) {
 	fmt.Println(i, ":", s)
+}
+
+func (a *App) ExerciseDelete(exercise models.Exercise) error {
+	return a.ExerciseC.Delete(exercise)
 }
 
 func (a *App) ExerciseGetAll() ([]models.Exercise, error) {
@@ -111,6 +107,10 @@ func (a *App) ExerciseUpdate(exercise models.Exercise) error {
 
 func (a *App) WorkoutAddExercise(workoutID int64, exerciseID int64) error {
 	return a.WorkoutC.AddExercise(&models.Workout{ID: workoutID}, &models.Exercise{ID: exerciseID})
+}
+
+func (a *App) WorkoutDelete(workout models.Workout) error {
+	return a.WorkoutC.Delete(workout)
 }
 
 func (a *App) WorkoutEdit(workout models.Workout) error {

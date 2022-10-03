@@ -1,4 +1,5 @@
 import {
+	WorkoutDelete,
 	WorkoutEdit,
 	WorkoutGet,
 	WorkoutGetWithExercises,
@@ -6,6 +7,10 @@ import {
 	WorkoutUpdate,
 	WorkoutUpdateWithExercises
 } from '../../../wailsjs/go/main/App';
+
+function DeleteWorkout(workout) {
+	return WorkoutDelete(workout);
+}
 
 function EditWorkout(workout) {
 	return WorkoutEdit(workout);
@@ -32,6 +37,7 @@ function UpdateWorkoutWithExercises(workout) {
 }
 
 export {
+	DeleteWorkout,
 	EditWorkout,
 	GetWorkouts,
 	GetWorkoutWithExercises,

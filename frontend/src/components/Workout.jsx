@@ -65,6 +65,33 @@ function AddExerciseModal(props) {
 	);
 }
 
+function ErrorModal(props) {
+	return (
+		<Modal
+			show={props.show}
+			onHide={props.onHide}
+			animation={false}
+			aria-labelledby="contained-modal-title-vcenter"
+			backdrop="static"
+			centered
+			size="sm"
+		>
+			<Modal.Body className="ErrorModalBody">
+				<h4>Error</h4>
+				<span className="ErrorModalBodyText">
+					Something went wrong!<br/>
+					"{props.error}"
+				</span>
+			</Modal.Body>
+			<Modal.Footer className="ErrorModalFooter">
+				<ListGroup.Item className="ErrorModalDismiss" action onClick={props.onHide}>
+					<h6>Dismiss</h6>
+				</ListGroup.Item>
+			</Modal.Footer>
+		</Modal>
+	);
+}
+
 function Workout(props) {
 	const [addExercise, setAddExercise] = useState(false);
 	const [error, setError] = useState("");
@@ -77,6 +104,7 @@ function Workout(props) {
 	};
 
 	const closeAddExercise = () => {
+		setExercise({});
 		setExercises([]);
 		setAddExercise(false);
 	};
@@ -98,14 +126,9 @@ function Workout(props) {
 		});
 	};
 
-	if (error !== "") {
-		return (
-			<>
-				<h1>Error: {error}</h1>
-			</>
-		); 
+	const closeError = () => {
+		setError("");
 	}
-
 
 	if (props.edit) {
 		return (
@@ -126,6 +149,7 @@ function Workout(props) {
 					</ListGroup.Item>
 				</ListGroup>
 				<AddExerciseModal header={"Add Exercise"} show={addExercise} onHide={closeAddExercise} exercises={exercises} exerciseChangeHandler={addExerciseChange} submit={addExerciseSubmit} />
+				<ErrorModal show={error !== ""} onHide={closeError} error={error} />
 			</>
 		);
 	}
@@ -134,9 +158,14 @@ function Workout(props) {
 	return (
 		<>
 			<ListGroup variant="flush" className="MenuList">
-				<ListGroup.Item>
-					<b>{props.workout.title}</b><br/>
-					{dateS}
+				<ListGroup.Item className="d-flex justify-content-between align-items-start">
+					<div>
+						<div className="BoldTitle">{props.workout.title}</div>
+						<div className="ColorDate">{dateS.substring(0, dateS.length-16)}</div>
+					</div>
+					<div className="ColorTime">
+						{props.workout.date.substring(11, 16) + props.workout.date.substring(22)}
+					</div>
 				</ListGroup.Item>
 			</ListGroup>
 			<WorkoutInput exercises={props.workout.exercises} exerciseChange={props.workoutExerciseChange} />
@@ -145,6 +174,7 @@ function Workout(props) {
 					<Button variant="primary" onClick={props.submitWorkoutHandler}>Submit</Button>
 				</ListGroup.Item>
 			</ListGroup>
+			<ErrorModal show={error !== ""} onHide={closeError} error={error} />
 		</>
 	);
 }

@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
+import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container';
+import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -13,20 +15,76 @@ import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row'
 
 import {
+	DeleteExercise,
 	GetExercises,
 	NewExercise,
 	UpdateExercise,
 } from '../controllers/build/ExercisesMenu';
 
+import './ExercisesMenu.css';
 import MenuBar from './MenuBar';
 
 import InfiniteScroll from "./InfiniteScroll";
 
 import arrowleft from '../assets/icons/arrow-90deg-left.svg';
 import back from '../assets/icons/arrow-left.svg';
+import dots from '../assets/icons/three-dots.svg';
 import pencil from '../assets/icons/pencil.svg';
 import pluscircle from '../assets/icons/plus-circle.svg';
 import search from '../assets/icons/search.svg';
+import trash from '../assets/icons/trash.svg';
+
+function ErrorModal(props) {
+	return (
+		<Modal
+			show={props.show}
+			onHide={props.onHide}
+			animation={false}
+			aria-labelledby="contained-modal-title-vcenter"
+			backdrop="static"
+			centered
+			size="sm"
+		>
+			<Modal.Body className="ErrorModalBody">
+				<h4>Error</h4>
+				<span className="ErrorModalBodyText">
+					Something went wrong!<br/>
+					"{props.error}"
+				</span>
+			</Modal.Body>
+			<Modal.Footer className="ErrorModalFooter">
+				<ListGroup.Item className="ErrorModalDismiss" action onClick={props.onHide}>
+					<h6>Dismiss</h6>
+				</ListGroup.Item>
+			</Modal.Footer>
+		</Modal>
+	);
+}
+
+function DeleteExerciseModal(props) {
+	return (
+		<Modal
+			show={props.show}
+			onHide={props.onHide}
+			animation={false}
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+		>
+			<Modal.Header>
+				<Modal.Title id="contained-modal-title-vcenter">
+					Delete Exercise 
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				Are you sure you want to delete {props.exerciseName}?
+			</Modal.Body>
+			<Modal.Footer>
+				<Button className="ExerciseDeleteCancelButton" variant="outline-secondary" onClick={props.onHide}>Cancel</Button>
+				<Button variant="danger" onClick={props.submit}>Delete</Button>
+			</Modal.Footer>
+		</Modal>
+	);
+}
 
 function ExerciseModal(props) {
 	return (
@@ -45,7 +103,7 @@ function ExerciseModal(props) {
 			<Modal.Body>
 				<InputGroup className="mb-3">
 					<InputGroup.Text>Exercise name</InputGroup.Text>
-					<FormControl value={props.name} onChange={(event) => props.setName(event.target.value)}/>
+					<FormControl autoFocus value={props.name} onChange={(event) => props.setName(event.target.value)}/>
 				</InputGroup>
 				<Form.Check inline type="checkbox" label="Calories" onChange={(event) => props.setCalories(event.target.checked)} checked={props.calories}/>
 				<Form.Check inline type="checkbox" label="Distance" onChange={(event) => props.setDistance(event.target.checked)} checked={props.distance}/>
@@ -63,6 +121,7 @@ function ExerciseModal(props) {
 function ExercisesMenu(props) {
 	const [error, setError] = useState("");
 	const [exercises, setExercises] = useState([]);
+	const [exerciseIndex, setExerciseIndex] = useState(-1);
 	const [exerciseID, setExerciseID] = useState(0);
 	const [exerciseName, setExerciseName] = useState("");
 	const [exerciseCalories, setExerciseCalories] = useState(false);
@@ -70,6 +129,7 @@ function ExercisesMenu(props) {
 	const [exerciseReps, setExerciseReps] = useState(false);
 	const [exerciseTime, setExerciseTime] = useState(false);
 	const [exerciseWeight, setExerciseWeight] = useState(false);
+	const [deleteExercise, setDeleteExercise] = useState(false);
 	const [editExercise, setEditExercise] = useState(false);
 	const [loading, setLoading] = InfiniteScroll(loadMoreItems);
 	const [newExercise, setNewExercise] = useState(false);
@@ -176,31 +236,90 @@ function ExercisesMenu(props) {
 		});
 	};
 
-	if (error !== "") {
-		return (
-			<>
-				<h1>Error: {error}</h1>
-			</>
-		); 
+	const closeDeleteExercise = () => {
+		setExerciseIndex(-1);
+		setExerciseName("");
+		setDeleteExercise(false);
+	}
+
+	const openDeleteExercise = (event) => {
+		let index = event.target.getAttribute("value");
+		setExerciseIndex(index);
+		setExerciseName(exercises[index].name);
+		setDeleteExercise(true);
+	}
+	
+	const submitDeleteExercise = () => {
+		setError("Deleting exercise");
+		DeleteExercise(exercises[exerciseIndex]).then(() => {
+			setError("");
+			closeDeleteExercise();
+			reload();
+		}).catch((err) => {
+			setError(err);
+		});
+	}
+
+	const formatExerciseTypes = (exercise) => {
+		let typeS = "";
+
+		if (exercise.calories) {
+			typeS = typeS + "Calories, "
+		}
+		if (exercise.distance) {
+			typeS = typeS + "Distance, "
+		}
+		if (exercise.reps) {
+			typeS = typeS + "Reps, "
+		}
+		if (exercise.time) {
+			typeS = typeS + "Time, "
+		}
+		if (exercise.weight) {
+			typeS = typeS + "Weight, "
+		}
+
+		return typeS.substring(0, typeS.length-2);
+	}
+
+	const closeError = () => {
+		setError("");
 	}
 
 	return (
 		<>
 		<MenuBar title={"Exercises"} leftIcon={back} leftClick={props.back} rightIcon={pluscircle} rightClick={openNewExercise}/>
-		<ListGroup variant="flush" className="MenuList">
+		<ListGroup variant="flush">
 			{exercises.map((exercise, index) => (
-			<ListGroup.Item key={index}>
-				<div className="MenuListDivLeft">
-					{exercise.name}
+				<ListGroup.Item className="d-flex justify-content-between align-items-start" key={index} >
+				<div>
+					<div className="ExerciseBoldName">
+						{exercise.name}
+					</div>
+					<div className="ExerciseColorTypes">
+						{formatExerciseTypes(exercise)}
+					</div>
 				</div>
-				<div className="MenuListDivRight">
-					<img className="MenuListIcon" src={pencil} value={index} onClick={openEditExercise}/>
+				<div>
+					<div>
+						<Dropdown>
+							<Dropdown.Toggle size="sm" className="ExerciseDropdownToggle">
+								<img className="ExerciseDropdownToggleIcon" src={dots} />
+							</Dropdown.Toggle>
+							<Dropdown.Menu className="ExerciseDropdownMenu">
+								<Dropdown.Item onClick={openEditExercise} key="1" value={index}>Edit <img value={index} className="ExerciseDropdownItemIcon" src={pencil} /></Dropdown.Item>
+								<Dropdown.Item className="ExerciseDropdownDelete" onClick={openDeleteExercise} key="2" value={index}>Delete <img value={index} className="ExerciseDropdownItemIcon" src={trash} /></Dropdown.Item>
+						</Dropdown.Menu>
+						</Dropdown>
+					</div>
 				</div>
 			</ListGroup.Item>
 			))}
 		</ListGroup>
 			<ExerciseModal title={"New Exercise"} show={newExercise} onHide={closeNewExercise} name={exerciseName} setName={setExerciseName} calories={exerciseCalories} setCalories={setExerciseCalories} distance={exerciseDistance} setDistance={setExerciseDistance} reps={exerciseReps} setReps={setExerciseReps} time={exerciseTime} setTime={setExerciseTime} weight={exerciseWeight} setWeight={setExerciseWeight} submit={submitNewExercise}/>
 			<ExerciseModal title={"Edit Exercise"} show={editExercise} onHide={closeEditExercise} name={exerciseName} setName={setExerciseName} calories={exerciseCalories} setCalories={setExerciseCalories} distance={exerciseDistance} setDistance={setExerciseDistance} reps={exerciseReps} setReps={setExerciseReps} time={exerciseTime} setTime={setExerciseTime} weight={exerciseWeight} setWeight={setExerciseWeight} submit={submitEditExercise}/>
+			<DeleteExerciseModal show={deleteExercise} onHide={closeDeleteExercise} exerciseName={exerciseName} submit={submitDeleteExercise} />
+			<ErrorModal show={error !== ""} onHide={closeError} error={error} />
 		</>
 	);
 }

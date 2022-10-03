@@ -70,6 +70,7 @@ type WorkoutExerciseService interface {
 	AutoMigrate() error
 	Create(we *WorkoutExercise) error
 	Delete(we *WorkoutExercise) error
+	DeleteByWorkout(w *Workout) error
 	Update(we *WorkoutExercise) error
 }
 
@@ -90,7 +91,7 @@ func (wes *workoutExerciseService) AutoMigrate() error {
 			reps INTEGER,
 			time INTEGER,
 			weight INTEGER,
-			FOREIGN KEY (workout_id) REFERENCES "%s" (id),
+			FOREIGN KEY (workout_id) REFERENCES "%s" (id) ON DELETE CASCADE,
 			FOREIGN KEY (exercise_id) REFERENCES "%s" (id)
 		)
 	`, workoutExerciseTable, workoutTable, exerciseTable)
@@ -151,7 +152,29 @@ func (wes *workoutExerciseService) Delete(we *WorkoutExercise) error {
 
 	_, err = wes.Database.Exec(deleteWorkoutExerciseQ, we.ID)
 	if err != nil {
-		return fmt.Errorf("models: error updating %s: %v", workoutExerciseTable, err)
+		return fmt.Errorf("models: error deleting %s: %v", workoutExerciseTable, err)
+	}
+
+	return nil
+}
+
+func (wes *workoutExerciseService) DeleteByWorkout(w *Workout) error {
+	err := runWorkoutValFuncs(
+		w,
+		workoutIDMinimum,
+	)
+	if err != nil {
+		return fmt.Errorf("models: %w", err)
+	}
+
+	deleteWorkoutExerciseQ := fmt.Sprintf(`
+		DELETE FROM "%s"
+		WHERE workout_id=?
+	`, workoutExerciseTable)
+
+	_, err = wes.Database.Exec(deleteWorkoutExerciseQ, w.ID)
+	if err != nil {
+		return fmt.Errorf("models: error deleting %s by workout: %v", workoutExerciseTable, err)
 	}
 
 	return nil
@@ -183,6 +206,10 @@ func (wes *workoutExerciseService) Update(we *WorkoutExercise) error {
 type workoutExerciseValFunc func(*WorkoutExercise) error
 
 func runWorkoutExerciseValFuncs(we *WorkoutExercise, fns ...workoutExerciseValFunc) error {
+	if we == nil {
+		return fmt.Errorf("workoutexercise is nil")
+	}
+
 	for _, fn := range fns {
 		err := fn(we)
 		if err != nil {

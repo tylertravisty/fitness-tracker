@@ -1,65 +1,55 @@
-.Workouts {
-	background-color: #FFFFFF;
-	min-height: 100vh;
-}
-
-.BoldWorkoutTitle {
+.ExerciseBoldName {
 	font-weight: bold;
 }
 
-.ColorWorkoutTime {
-	color: #1F37AD;
-}
-
-.ColorWorkoutDate {
+.ExerciseColorTypes {
 	opacity: 0.7;
 }
 
-.WorkoutDeleteCancelButton {
-	color: #292B2C !important;
-}
-
-.WorkoutDeleteCancelButton:hover {
-	color: white !important;
-}
-
-.WorkoutDropdownMenu {
+.ExerciseDropdownMenu {
 	right: 16px;
 	padding-top: 0px !important;
 	padding-bottom: 0px !important;
 }
 
-.WorkoutDropdownToggle {
+.ExerciseDropdownToggle {
 	background-color: white !important;
 	border: none !important;
 	color: black !important;
 	height: 16px !important;
 	width: 16px !important;
-	margin-left: 75%;
 	padding: 0px !important;
 }
 
-.WorkoutDropdownToggle::after {
+.ExerciseDropdownToggle::after {
 	display: none !important;
 }
 
-.WorkoutDropdownToggleIcon {
+.ExerciseDropdownToggleIcon {
 	height: 16px;
 	width: 16px;
 	vertical-align: baseline;
 }
 
-.WorkoutDropdownMenuIcon {
+.ExerciseDropdownMenuIcon {
 	margin-left: 75%;
 }
 
-.WorkoutDropdownDelete {
+.ExerciseDropdownDelete {
 	color: red !important;
 }
 
-.WorkoutDropdownItemIcon {
+.ExerciseDropdownItemIcon {
 	float: right;
 	margin-top: 4px;
+}
+
+.ExerciseDeleteCancelButton {
+	color: #292B2C !important;
+}
+
+.ExerciseDeleteCancelButton:hover {
+	color: white !important;
 }
 
 .ErrorModalFooter {

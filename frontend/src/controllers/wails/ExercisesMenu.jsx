@@ -1,9 +1,14 @@
 import {
+	ExerciseDelete,
 	ExerciseGet,
 	ExerciseGetAll,
 	ExerciseNew,
 	ExerciseUpdate
 } from '../../../wailsjs/go/main/App';
+
+function DeleteExercise(exercise) {
+	return ExerciseDelete(exercise);
+}
 
 function GetExercises(page) {
 	return ExerciseGet(page);
@@ -22,6 +27,7 @@ function UpdateExercise(exercise) {
 }
 
 export {
+	DeleteExercise,
 	GetExercises,
 	GetAllExercises,
 	NewExercise,

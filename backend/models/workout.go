@@ -75,7 +75,7 @@ type WorkoutService interface {
 	ByID(id int64) (*Workout, error)
 	ByIDWithExercises(id int64) (*Workout, error)
 	Create(w *Workout) error
-	//Delete(w *Workout) error
+	Delete(w *Workout) error
 	Update(w *Workout) error
 }
 
@@ -243,6 +243,28 @@ func (ws *workoutService) Create(w *Workout) error {
 	return nil
 }
 
+func (ws *workoutService) Delete(w *Workout) error {
+	err := runWorkoutValFuncs(
+		w,
+		workoutIDMinimum,
+	)
+	if err != nil {
+		return fmt.Errorf("models: %w", err)
+	}
+
+	deleteWorkoutQ := fmt.Sprintf(`
+		DELETE FROM "%s"
+		WHERE id=?
+	`, workoutTable)
+
+	_, err = ws.Database.Exec(deleteWorkoutQ, w.ID)
+	if err != nil {
+		return fmt.Errorf("models: error deleting %s: %v", workoutTable, err)
+	}
+
+	return nil
+}
+
 func (ws *workoutService) Update(w *Workout) error {
 	err := runWorkoutValFuncs(
 		w,
@@ -271,6 +293,10 @@ func (ws *workoutService) Update(w *Workout) error {
 type workoutValFunc func(*Workout) error
 
 func runWorkoutValFuncs(w *Workout, fns ...workoutValFunc) error {
+	if w == nil {
+		return fmt.Errorf("workout is nil")
+	}
+
 	for _, fn := range fns {
 		err := fn(w)
 		if err != nil {

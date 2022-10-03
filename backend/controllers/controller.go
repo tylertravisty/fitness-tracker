@@ -11,9 +11,14 @@ import (
 )
 
 var (
+	ErrExerciseCreate        = errors.New("error creating exercise")
+	ErrExerciseDelete        = errors.New("error deleting exercise")
+	ErrExerciseUpdate        = errors.New("error updating exercise")
+	ErrExercisesQuery        = errors.New("error querying exercises")
 	ErrTimeLocation          = errors.New("error loading time location")
 	ErrWorkoutAddExercise    = errors.New("error adding exercise to workout")
 	ErrWorkoutCreate         = errors.New("error creating workout")
+	ErrWorkoutDelete         = errors.New("error deleting workout")
 	ErrWorkoutParseDate      = errors.New("error parsing workout date")
 	ErrWorkoutQuery          = errors.New("error querying workout")
 	ErrWorkoutUpdate         = errors.New("error updating workout")

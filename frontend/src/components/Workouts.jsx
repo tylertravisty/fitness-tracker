@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import Button from 'react-bootstrap/Button';
+import Dropdown from 'react-bootstrap/Dropdown';
 import FormControl from 'react-bootstrap/FormControl';
 import InputGroup from 'react-bootstrap/InputGroup';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -16,6 +17,7 @@ import {
 } from './Navigation';
 
 import {
+	DeleteWorkout,
 	EditWorkout,
 	GetWorkouts,
 	GetWorkoutWithExercises,
@@ -32,10 +34,64 @@ import arrowleft from '../assets/icons/arrow-90deg-left.svg';
 import back from '../assets/icons/arrow-left.svg';
 import blank from '../assets/icons/blank.svg';
 import cancel from '../assets/icons/x.svg';
+import dots from '../assets/icons/three-dots.svg';
 import pencil from '../assets/icons/pencilsquare.svg';
 import pluscircle from '../assets/icons/plus-circle.svg';
 import save from '../assets/icons/check2-square.svg';
 import search from '../assets/icons/search.svg';
+import trash from '../assets/icons/trash.svg';
+
+function DeleteWorkoutModal(props) {
+	return (
+		<Modal
+			show={props.show}
+			onHide={props.onHide}
+			animation={false}
+			aria-labelledby="contained-modal-title-vcenter"
+			centered
+		>
+			<Modal.Header>
+				<Modal.Title id="contained-modal-title-vcenter">
+					Delete Workout
+				</Modal.Title>
+			</Modal.Header>
+			<Modal.Body>
+				Are you sure you want to delete {props.workoutTitle}?
+			</Modal.Body>
+			<Modal.Footer>
+				<Button className="WorkoutDeleteCancelButton" variant="outline-secondary" onClick={props.onHide}>Cancel</Button>
+				<Button variant="danger" onClick={props.submit}>Delete</Button>
+			</Modal.Footer>
+		</Modal>
+	);
+}
+
+function ErrorModal(props) {
+	return (
+		<Modal
+			show={props.show}
+			onHide={props.onHide}
+			animation={false}
+			aria-labelledby="contained-modal-title-vcenter"
+			backdrop="static"
+			centered
+			size="sm"
+		>
+			<Modal.Body className="ErrorModalBody">
+				<h4>Error</h4>
+				<span className="ErrorModalBodyText">
+					Something went wrong!<br/>
+					"{props.error}"
+				</span>
+			</Modal.Body>
+			<Modal.Footer className="ErrorModalFooter">
+				<ListGroup.Item className="ErrorModalDismiss" action onClick={props.onHide}>
+					<h6>Dismiss</h6>
+				</ListGroup.Item>
+			</Modal.Footer>
+		</Modal>
+	);
+}
 
 function NewWorkoutModal(props) {
 	return (
@@ -54,7 +110,7 @@ function NewWorkoutModal(props) {
 			<Modal.Body>
 				<InputGroup className="mb-3">
 					<InputGroup.Text>Workout title</InputGroup.Text>
-					<FormControl value={props.workoutTitle} onChange={(event) => {props.workoutTitleChangeHandler(event.target.value)}}/>
+					<FormControl autoFocus value={props.workoutTitle} onChange={(event) => {props.workoutTitleChangeHandler(event.target.value)}}/>
 				</InputGroup>
 			</Modal.Body>
 			<Modal.Footer>
@@ -75,6 +131,7 @@ function Workouts(props) {
 	const [onStart, setOnStart] = useState(true);
 	const [page, setPage] = useState(0);
 	const [workouts, setWorkouts] = useState([]);
+	const [workoutIndex, setWorkoutIndex] = useState(-1);
 	const [workoutID, setWorkoutID] = useState(0);
 	const [workoutDate, setWorkoutDate] = useState("");
 	const [origWorkoutDate, setOrigWorkoutDate] = useState("");
@@ -83,6 +140,9 @@ function Workouts(props) {
 	const [workoutExercises, setWorkoutExercises] = useState([]);
 	const [origWorkoutExercises, setOrigWorkoutExercises] = useState([]);
 	const [workoutWithExercises, setWorkoutWithExercises] = useState({});
+	const [workoutPageReload, setWorkoutPageReload] = useState(false);
+	const [reloadWorkoutID, setReloadWorkoutID] = useState(0);
+	const [deleteWorkout, setDeleteWorkout] = useState(false);
 
 	useEffect(() => {
 		if (onStart) {
@@ -115,6 +175,9 @@ function Workouts(props) {
 		GetWorkouts(page).then((result) => {
 			setOnStart(false);
 			const count = result.length;
+			result.map((workout, index) => {
+				result[index].show = false;
+			});
 			setWorkouts([...workouts, ...result]);
 			if (count > 0) {
 				setPage(page + 1);
@@ -125,10 +188,12 @@ function Workouts(props) {
 	};
 
 	const getWorkoutWithExercises = (id) => {
-		setError("Getting workout with exercises");
+		//setError("Getting workout with exercises");
 		GetWorkoutWithExercises(id).then((result) => {
 			setWorkoutWithExercises(result);
-			setError("");
+			//setError("");
+			setWorkoutPageReload(false);
+			setWorkoutPage(true);
 		}).catch((err) => {
 			setError(err);
 		});
@@ -146,12 +211,11 @@ function Workouts(props) {
 	const updateWorkoutAddExercises = (workout) => {
 		setError("Updating workout");
 		EditWorkout(workout).then(() => {
+			getWorkoutWithExercises(workout.id);
 			setError("");
 		}).catch((err) => {
 			setError(err);
 		});
-
-		getWorkoutWithExercises(workout.id);
 	};
 
 	const resetWorkout = () => {
@@ -197,8 +261,11 @@ function Workouts(props) {
 	};
 
 	const openWorkoutPage = (index) => {
+		if (index === null) {
+			return;
+		}
 		getWorkoutWithExercises(workouts[index].id);
-		setWorkoutPage(true);
+		//setWorkoutPage(true);
 	};
 
 	const cancelWorkoutPageEdit = () => {
@@ -217,7 +284,7 @@ function Workouts(props) {
 
 	const editWorkoutPage = () => {
 		setWorkoutID(workoutWithExercises.id);
-		setWorkoutDate(workoutWithExercises.date);
+		workoutWithExercises:setWorkoutDate(workoutWithExercises.date);
 		setOrigWorkoutDate(workoutWithExercises.date);
 		setWorkoutTitle(workoutWithExercises.title);
 		setOrigWorkoutTitle(workoutWithExercises.title);
@@ -307,21 +374,58 @@ function Workouts(props) {
 		});
 	}
 
-	if (error !== "") {
-		return (
-			<>
-				<h1>Error: {error}</h1>
-			</>
-		); 
+	const closeDeleteWorkout = () => {
+		setWorkoutIndex(-1);
+		setWorkoutTitle("");
+		setDeleteWorkout(false);
 	}
 
+	const openDeleteWorkout = (event) => {
+		event.stopPropagation();
+
+		let index = event.target.getAttribute("value");
+		setWorkoutIndex(index);
+		setWorkoutTitle(workouts[index].title);
+		setDeleteWorkout(true);
+	}
+
+	const submitDeleteWorkout = () => {
+		setError("Deleting workout");
+		DeleteWorkout(workouts[workoutIndex]).then(() => {
+			setError("");
+			closeDeleteWorkout();
+			reload();
+		}).catch((err) => {
+			setError(err);
+		});
+	}
+
+	const parseWorkoutDate = (datetime) => {
+		let ymd = datetime.substring(0,10);
+		let time = datetime.substring(11, 16);
+		let timezone = datetime.substring(17, 22);
+		let date = new Date(ymd + "T" + time + ":00" + timezone);
+
+		let day = new Intl.DateTimeFormat('en-US', {weekday:'long'}).format(date);
+
+		let month = new Intl.DateTimeFormat('en-US', {month:'long'}).format(date);
+
+		let dateS = day + ", " + month + " " + date.getDate();
+
+		return dateS;
+	}
+
+	const closeError = () => {
+		setError("");
+	}
+	
 	if (workoutPageEdit) {
 		let date = workoutWithExercises.date.substring(0, 10);
 		let time = workoutWithExercises.date.substring(11, 16);
 		return(
 			<>
 				<MenuBar bottom={true} leftIcon={cancel} leftClick={cancelWorkoutPageEdit} title={"Workout"} rightIcon={save} rightClick={saveWorkoutPage} />
-				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} exerciseAdd={workoutExerciseAdd} workoutExerciseChange={workoutExerciseChange} />
+				<Workout workout={workoutWithExercises} edit={true} date={date} time={time} titleChange={workoutTitleChange} dateChange={workoutDateChange} timeChange={workoutTimeChange} exerciseAdd={workoutExerciseAdd} workoutExerciseChange={workoutExerciseChange} />
 				<Navigation parent={NavHome} reset={closeWorkoutPage} />
 			</>
 		);
@@ -331,7 +435,7 @@ function Workouts(props) {
 		return(
 			<>
 				<MenuBar bottom={true} leftIcon={back} leftClick={closeWorkoutPage} title={"Workout"} rightIcon={pencil} rightClick={editWorkoutPage} />
-				<Workout workout={workoutWithExercises} workoutExerciseChange={workoutExerciseChange} submitWorkoutHandler={workoutSubmit} edit={false}/>
+				<Workout workout={workoutWithExercises} workoutExerciseChange={workoutExerciseChange} submitWorkoutHandler={workoutSubmit} edit={false} />
 				<Navigation parent={NavHome} reset={closeWorkoutPage} />
 			</>
 		);
@@ -342,14 +446,33 @@ function Workouts(props) {
 			<MenuBar title={"Workouts"} leftIcon={blank} rightIcon={pluscircle} rightClick={openNewWorkout}/>
 			<ListGroup variant="flush" className="MenuList">
 				{workouts.map((workout, index) => (
-					<ListGroup.Item key={index} value={index} action onClick={(event) => {openWorkoutPage(event.target.getAttribute('value'))}}>
-						<b value={index}>{workout.title}</b><br/>
-					{workout.date.substring(0, 16) + workout.date.substring(22)}
-				</ListGroup.Item>
+					<ListGroup.Item action className="d-flex justify-content-between align-items-start" key={index} value={index} onClick={(event) => {openWorkoutPage(event.target.getAttribute('value'))}}>
+						<div value={index}>
+							<div className="BoldWorkoutTitle" value={index}>{workout.title}</div>
+							<div className="ColorWorkoutDate" value={index}>{parseWorkoutDate(workout.date)}</div>
+						</div>
+						<div>
+							<div>
+								<Dropdown>
+									<Dropdown.Toggle size="sm" className="WorkoutDropdownToggle">
+										<img className="WorkoutDropdownToggleIcon" src={dots} />
+									</Dropdown.Toggle>
+									<Dropdown.Menu className="WorkoutDropdownMenu">
+									<Dropdown.Item className="WorkoutDropdownDelete" onClick={openDeleteWorkout} key="1" value={index}>Delete <img value={index} className="WorkoutDropdownItemIcon" src={trash} /></Dropdown.Item>
+								</Dropdown.Menu>
+								</Dropdown>
+							</div>
+							<div className="ColorWorkoutTime" value={index}>
+								{workout.date.substring(11, 16) + workout.date.substring(22)}
+							</div>
+						</div>
+					</ListGroup.Item>
 				))}
 			</ListGroup>
 			<Navigation parent={NavHome}/>
 			<NewWorkoutModal header={"New Workout"} show={newWorkout} onHide={closeNewWorkout} workoutTitle={workoutTitle} workoutTitleChangeHandler={setWorkoutTitle} workoutDate={workoutDate} submitWorkoutHandler={newWorkoutSubmit}/>
+			<DeleteWorkoutModal show={deleteWorkout} onHide={closeDeleteWorkout} submit={submitDeleteWorkout} workoutTitle={workoutTitle} />
+			<ErrorModal show={error !== ""} onHide={closeError} error={error} />
 		</div>
 	);
 }

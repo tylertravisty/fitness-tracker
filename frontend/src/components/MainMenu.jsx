@@ -12,7 +12,6 @@ import pluscircle from '../assets/icons/plus-circle.svg';
 import ExercisesMenu from './ExercisesMenu';
 import MenuBar from './MenuBar';
 import Navigation from './Navigation';
-import WorkoutsMenu from './WorkoutsMenu';
 import "./MainMenu.css";
 
 import {
@@ -22,7 +21,6 @@ import {
 
 function MainMenu() {
 	const [exercisesMenu, setExercisesMenu] = useState(false);
-	const [workoutsMenu, setWorkoutsMenu] = useState(false);
 	const [name, setName] = useState(NavMainMenu);
 
 	const closeExercisesMenu = () => {
@@ -33,17 +31,12 @@ function MainMenu() {
 		setExercisesMenu(true)
 	};
 
-	const closeWorkoutsMenu = () => {
-		setWorkoutsMenu(false)
-	};
+	const openCredits = () => {
 
-	const openWorkoutsMenu = () => {
-		setWorkoutsMenu(true)
-	};
+	}
 
 	const reset = () => {
 		setExercisesMenu(false);
-		setWorkoutsMenu(false);
 		setName(NavMainMenu);
 	};
 
@@ -56,21 +49,12 @@ function MainMenu() {
 		);
 	}
 
-	if (workoutsMenu) {
-		return (
-			<div className="Menu">
-				<WorkoutsMenu back={closeWorkoutsMenu}/>
-				<Navigation parent={name} reset={reset}/>
-			</div>
-		);
-	}
-
 	return(
 		<div className="Menu">
 			<MenuBar title={"Main Menu"} />
 			<ListGroup variant="flush" className="MenuList">
 				<ListGroup.Item action onClick={openExercisesMenu}>Exercises</ListGroup.Item>
-				<ListGroup.Item action onClick={openWorkoutsMenu}>Workouts</ListGroup.Item>
+				<ListGroup.Item action onClick={openCredits}>Credits</ListGroup.Item>
 			</ListGroup>
 			<Navigation parent={name}/>
 		</div>

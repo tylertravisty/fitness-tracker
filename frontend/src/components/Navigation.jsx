@@ -50,12 +50,6 @@ function Navigation(props) {
 				<Nav.Item className={props.parent === NavHome ? "NavigationButtonActive" : "NavigationButton"}>
 					<img className={props.parent === NavHome ? "NavigationIconActive" : "NavigationIcon"} src={props.parent === NavHome ? housedoorfill : housedoor} onClick={props.parent === NavHome ? props.reset : toHome}/>
 				</Nav.Item>
-				<Nav.Item className="NavigationButton">
-					<img className="NavigationIcon" src={pluscircle}/>
-				</Nav.Item>
-				<Nav.Item className="NavigationButton">
-					<img className="NavigationIcon" src={pluscircle}/>
-				</Nav.Item>
 				<Nav.Item className={props.parent === NavMainMenu ? "NavigationButtonActive" : "NavigationButton"}>
 					<img className={props.parent === NavMainMenu ? "NavigationIconActive" : "NavigationIcon"} src={props.parent === NavMainMenu ? gridfill : grid} onClick={props.parent === NavMainMenu ? props.reset : toMainMenu}/>
 				</Nav.Item>
